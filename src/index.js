@@ -80,13 +80,37 @@ class FBDClass {
         }
         // console.log("vlist", vlist);
 
-        // 
+        // sum up vectors. just assume for fun they start at 0,0
+        let sums = {
+            force_up: 0,
+            force_down: 0,
+            force_left: 0,
+            force_right: 0
+        };
+        // TODO Probably use reduce
+        for (let info of Object.values(this.vecs_data)) {
+            let x = info.distance * Math.cos(info.theta);
+            let y = info.distance * Math.sin(info.theta);
+            if (x > 0) {
+                sums.force_left += Math.abs(x);
+            } else {
+                sums.force_right += Math.abs(x)
+            }
+            if (y > 0) {
+                sums.force_up += Math.abs(y);
+            } else {
+                sums.force_down += Math.abs(y);
+            }
+        }
+        let total_x = sums.force_left - sums.force_right;
+        let total_y = sums.force_up - sums.force_down;
+        document.querySelector("#sums").innerHTML = `X: ${total_x.toFixed(2)}, Y: ${total_y.toFixed(2)}`;
     }
 
     nearest_grid_point(x, y, dict) {
         //
         dict = dict || false;
-        const to = 40; // should match background-size, and be double background-position from css#container
+        const to = this.gridsize; // should match background-size, and be double background-position from css#container
 
         // 20x20 is the middle of the cell
         
