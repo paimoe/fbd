@@ -1,0 +1,28 @@
+{
+  "name": "fbd",
+  "version": "1.0.0",
+  "description": "free body diagrams",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/paimoe/fbd.git"
+  },
+  "author": "paimoe",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/paimoe/fbd/issues"
+  },
+  "homepage": "https://github.com/paimoe/fbd#readme",
+  "dependencies": {
+    "konva": "^8.3.3",
+    "underscore": "^1.13.2"
+  },
+  "devDependencies": {
+    "webpack": "^5.69.1",
+    "webpack-cli": "^4.9.2",
+    "webpack-dev-server": "^4.7.4"
+  }
+}
