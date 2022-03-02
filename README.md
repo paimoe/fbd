@@ -1,6 +1,6 @@
 # Free Body Diagrams
 
-Way too late since I finished my Physics units.
+Way too late since I finished my Physics units. Runs with [Konva](https://github.com/konvajs/konva).
 
 ## Build and Run
 ```

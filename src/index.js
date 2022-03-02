@@ -22,6 +22,7 @@ class FBDClass {
             to_y: null,
         };
         this.vecs = [];
+        this.vecs_data = {}; // meta data like distance and stuff, calculated when arrow is finished
     }
 
     init() {
@@ -62,11 +63,24 @@ class FBDClass {
         this.stage.add(this.arrowLayer);
 
         this.setup_event_handlers();
-
     }
 
-    render() {
-        // Might not need this obviously
+    render_ui() {
+        // Rebuild list of arrowz
+        let vlist = document.querySelector("ul#vectorlist");
+        vlist.innerHTML = "";
+        // Also construct the sum
+        for (let vec of this.vecs) {
+            let li = document.createElement("li");
+            let pts = vec.points();
+            let id = vec.id();
+            let info = this.vecs_data[id];
+            li.appendChild(document.createTextNode(`[${id}] from(${pts[0]}, ${pts[1]}) -> to(${pts[2]}, ${pts[3]}).\nDistance: ${info.distance.toFixed(2)}`));
+            vlist.appendChild(li);
+        }
+        // console.log("vlist", vlist);
+
+        // 
     }
 
     nearest_grid_point(x, y, dict) {
@@ -156,6 +170,7 @@ class FBDClass {
                 });
 
                 // Add to arrows layer
+                let newId = _.uniqueId("vec_");
                 let arrow = new Konva.Arrow({
                     visible: true,
                     fill: 'green', // changeable
@@ -164,13 +179,16 @@ class FBDClass {
                     pointerLength: 10,
                     pointerWidth: 10,
                     points: [this.vec.from_x, this.vec.from_y, this.vec.to_x, this.vec.to_y],
-                    id: _.uniqueId("vec_"),
+                    id: newId,
                 });
                 this.vec = {
                     from_x: null, from_y: null, to_x: null, to_y: null
                 };
                 this.arrowLayer.add(arrow);
                 this.vecs.push(arrow);
+                this.vecs_data[newId] = vec;
+
+                this.render_ui();
             } else {
                 // Check if we are close to an arrow. maybe for now just head/tail and if we are, select that arrow
                 this.is.drawing = true;
