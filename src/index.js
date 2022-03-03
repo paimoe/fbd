@@ -59,6 +59,22 @@ class FBDClass {
         });
         this.arrowLayer.add(this.arrow);
 
+        // Add decompose arrows
+        this.decompose = {x: null, y: null};
+        let decompose_vars = {
+            visible: false,
+            opacity: 0.5,
+            fill: 'black',
+            stroke: 'black',
+            strokeWidth: 4,
+            pointerLength: 10,
+            pointerWidth: 10,
+        };
+        this.decompose.x = new Konva.Arrow(decompose_vars);
+        this.decompose.y = new Konva.Arrow(decompose_vars);
+        this.arrowLayer.add(this.decompose.x);
+        this.arrowLayer.add(this.decompose.y);
+
         this.stage.add(this.diagramLayer);
         this.stage.add(this.arrowLayer);
 
@@ -89,22 +105,30 @@ class FBDClass {
         };
         // TODO Probably use reduce
         for (let info of Object.values(this.vecs_data)) {
-            let x = info.distance * Math.cos(info.theta);
-            let y = info.distance * Math.sin(info.theta);
-            if (x > 0) {
-                sums.force_left += Math.abs(x);
+            let comp = this.components(info.distance, info.theta);
+            if (comp.x > 0) {
+                sums.force_left += Math.abs(comp.x);
             } else {
-                sums.force_right += Math.abs(x)
+                sums.force_right += Math.abs(comp.x)
             }
-            if (y > 0) {
-                sums.force_up += Math.abs(y);
+            if (comp.y > 0) {
+                sums.force_up += Math.abs(comp.y);
             } else {
-                sums.force_down += Math.abs(y);
+                sums.force_down += Math.abs(comp.y);
             }
         }
         let total_x = sums.force_left - sums.force_right;
         let total_y = sums.force_up - sums.force_down;
         document.querySelector("#sums").innerHTML = `X: ${total_x.toFixed(2)}, Y: ${total_y.toFixed(2)}`;
+
+        // Also show this in a simple four-arrow display, with the sums
+    }
+
+    components(r, theta) {
+        return {
+            x: r * Math.cos(theta),
+            y: r * Math.sin(theta)
+        }
     }
 
     nearest_grid_point(x, y, dict) {
@@ -147,13 +171,18 @@ class FBDClass {
         const cfrom = {x: 0, y: 0};
         const cto = {x: to.x - from.x, y: from.y - to.y};
 
+        const r = Math.sqrt(x_dist**2 + y_dist**2);
+        const theta = Math.atan2(cto.y, cto.x);
+
         return {
             "from": from,
             "to": to,
             "cfrom": cfrom,
             "cto": cto,
-            distance: Math.sqrt(x_dist**2 + y_dist**2),
-            theta: Math.atan2(cto.y, cto.x),
+            distance: r,
+            "theta": theta,
+            x_component: r * Math.cos(theta),
+            y_component: r * Math.sin(theta)
         };
     }
 
@@ -213,12 +242,25 @@ class FBDClass {
                     e.target.setAttrs({
                         fill: 'red', stroke: 'red'
                     });
-                    // perhaps show decomposed arrows, with half opacity
+                    let vec = this.vector_info({
+                        x: e.target.points()[0],
+                        y: e.target.points()[1],
+                    }, {
+                        x: e.target.points()[2],
+                        y: e.target.points()[3]
+                    });
+                    // perhaps show decomposed arrows, with half opacity\
+                    this.decompose.x.points([e.target.points()[0], e.target.points()[1], e.target.points()[0] + vec.x_component, e.target.points()[1]]);
+                    this.decompose.y.points([e.target.points()[0], e.target.points()[1], e.target.points()[0], e.target.points()[1] - vec.y_component]);
+                    this.decompose.x.show();
+                    this.decompose.y.show();
                 });
                 arrow.on("mouseout", e => {
                     e.target.setAttrs({
                         fill: 'green', stroke: 'green',
                     });
+                    this.decompose.x.hide();
+                    this.decompose.y.hide();
                 })
                 this.vec = {
                     from_x: null, from_y: null, to_x: null, to_y: null
