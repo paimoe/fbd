@@ -204,7 +204,22 @@ class FBDClass {
                     pointerWidth: 10,
                     points: [this.vec.from_x, this.vec.from_y, this.vec.to_x, this.vec.to_y],
                     id: newId,
+
+                    // allows larger hit detection region    
+                    hitStrokeWidth: 20,
                 });
+                arrow.on("mouseover", e => {
+                    let target = e.target; // this is the konva arrow object
+                    e.target.setAttrs({
+                        fill: 'red', stroke: 'red'
+                    });
+                    // perhaps show decomposed arrows, with half opacity
+                });
+                arrow.on("mouseout", e => {
+                    e.target.setAttrs({
+                        fill: 'green', stroke: 'green',
+                    });
+                })
                 this.vec = {
                     from_x: null, from_y: null, to_x: null, to_y: null
                 };
